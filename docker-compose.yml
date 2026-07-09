@@ -1,0 +1,25 @@
+# 로컬 개발용 Postgres.
+# 앱은 호스트에서 `pnpm dev`로 실행하고 이 컨테이너(localhost:5432)에 접속합니다.
+# 값은 같은 디렉토리의 .env 에서 주입됩니다 (.env.example 참고).
+# 프로덕션(앱+DB 함께 기동)용 compose 는 배포 단계에서 별도로 작성합니다.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: donutest-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
