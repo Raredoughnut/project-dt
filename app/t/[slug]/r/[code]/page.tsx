@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getPlayableTestMock } from "@/src/client/sections/test-play/mock";
-import { TestResultView } from "@/src/client/sections/test-result/views/test-result-view";
+import { TestResultContainer } from "@/src/client/sections/test-result/test-result-container";
 import { LoadingView } from "@/src/client/sections/loading/loading-view";
 
 export async function generateMetadata({
@@ -36,22 +36,7 @@ export default function TestResultPage({
 }) {
   return (
     <Suspense fallback={<LoadingView />}>
-      <ResultContent params={params} searchParams={searchParams} />
+      <TestResultContainer params={params} searchParams={searchParams} />
     </Suspense>
   );
-}
-
-async function ResultContent({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string; code: string }>;
-  searchParams: Promise<{ name?: string }>;
-}) {
-  const { slug, code } = await params;
-  const { name } = await searchParams;
-  const test = getPlayableTestMock(slug);
-  // 코드가 없거나 매칭되지 않으면 첫 결과로 폴백(스캐폴드).
-  const result = test.results.find((r) => r.code === code) ?? test.results[0];
-  return <TestResultView test={test} result={result} name={name} />;
 }

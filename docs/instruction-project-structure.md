@@ -4,7 +4,7 @@
 app/  # Next.js App Router (라우팅 · 페이지)
 src/
 ├── client/
-│   ├── features/                 # 기능별 블록 (Container + View + ViewModel)
+│   ├── sections/                 # 기능별 블록 (Container + View + ViewModel)
 │   │   └── [feature]/
 │   │       ├── [feature]-container.tsx
 │   │       ├── [feature]-view.tsx

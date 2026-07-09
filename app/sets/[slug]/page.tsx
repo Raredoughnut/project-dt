@@ -1,15 +1,15 @@
 import { Suspense } from "react";
-import { TestIntroContainer } from "@/src/client/sections/test-intro/test-intro-container";
+import { SetDetailContainer } from "@/src/client/sections/sets/set-detail-container";
 import { LoadingView } from "@/src/client/sections/loading/loading-view";
 
-export default function TestIntroPage({
+export default function SetDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   return (
     <Suspense fallback={<LoadingView />}>
-      <TestIntroContainer params={params} />
+      <SetDetailContainer params={params} />
     </Suspense>
   );
 }
