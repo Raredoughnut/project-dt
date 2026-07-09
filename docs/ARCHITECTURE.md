@@ -45,9 +45,9 @@
 - **Question** `{ id, testId, order, text, groupKey? }`
 - **Choice** `{ id, questionId, order, label, scores: Record<DimensionKey, number> }`
 - **ResultCard** `{ id, testId, code, title, subtitle, description, image, traits: string[], recommendedSlugs: string[] }`
-- 결과 결정: `axis`(축별 승자 조합 → 코드) 또는 `sum`(최고점 유형)
-  - 채점 엔진은 `src/domain/scoring.ts`의 순수 함수(`score`/`scoreSum`/`scoreAxis`/`collectSelectedScores`), 단위 테스트 `src/domain/scoring.test.ts`(`pnpm test`).
-  - ⚠️ 후속: `axis` 채점의 축 구성(폴 문자·순서)은 현재 DB에 없음. 엔진은 파라미터로 받으므로, 첫 축형 테스트/어드민 구현 시 `tests.axisConfig jsonb` 컬럼을 추가해 영속화한다(현재 시드는 `sum`형이라 불필요).
+- 결과 결정: `axis`(MBTI 4축 부호 합 → 코드) 또는 `sum`(최고점 유형)
+  - 채점 엔진: `src/domain/scoring.ts`(순수 함수) + 축 정의 `src/domain/mbti.ts`(`MBTI_AXES`). 단위 테스트 `src/domain/scoring.test.ts`(`pnpm test`).
+  - **axis(MBTI)**: 선택지 `scores`는 축 키(`energy`/`information`/`decisions`/`lifestyle`)에 **부호 점수**(2문항 ±1, 4문항 ±1/±0.5). 축별 합 `>0`→앞글자 · `<0`→뒷글자 · `=0`→앞글자(E/S/T/J), 4축 순서로 이어 MBTI 코드. 축이 표준 고정이라 별도 DB 컬럼 불필요.
 - **TestSet** `{ id, slug, title, description }` + 조인 테이블 **TestSetItem** `{ testSetId, testId, order }` — 운영자 큐레이션(참조 무결성 + 순서 보장)
 
 통계:

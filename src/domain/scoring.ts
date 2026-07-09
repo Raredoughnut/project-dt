@@ -4,10 +4,11 @@ import type {
   ScoreMap,
   ScoreResult,
 } from "./types";
+import { MBTI_AXES } from "./mbti";
 
 /* ========================================================================
    donutest — 채점 엔진 (순수 함수)
-   sum: 최고점 차원이 결과 · axis: 축별 우세 폴을 이어 코드 구성
+   sum: 최고점 차원이 결과 · axis(MBTI): 축별 부호 합으로 폴을 판정해 코드 구성
    ======================================================================== */
 
 /** 여러 점수 맵을 차원별로 합산한다. */
@@ -46,32 +47,30 @@ export function scoreSum(
   return { code: pickTieBreak(candidates, tieBreak), totals };
 }
 
-/** axis 채점: 축마다 우세한 폴 문자를 이어 코드 구성 (동점 시 positive). */
+/**
+ * axis 채점 (MBTI): 축별 부호 합으로 폴을 판정해 코드를 구성한다.
+ * 합 > 0 → positive(앞글자), 합 < 0 → negative(뒷글자), 합 = 0 → positive(앞글자).
+ */
 export function scoreAxis(
   selectedScores: ScoreMap[],
-  axes: AxisConfig[]
+  axes: AxisConfig[] = MBTI_AXES
 ): ScoreResult {
   if (axes.length === 0) {
     throw new Error("scoreAxis: axes 구성이 비어 있습니다.");
   }
   const totals = mergeScores(selectedScores);
   const code = axes
-    .map((axis) => {
-      const pos = totals[axis.positive] ?? 0;
-      const neg = totals[axis.negative] ?? 0;
-      return pos >= neg ? axis.positive : axis.negative;
-    })
+    .map((axis) =>
+      (totals[axis.key] ?? 0) >= 0 ? axis.positive : axis.negative
+    )
     .join("");
   return { code, totals };
 }
 
-/** scoringType에 따라 적절한 채점 함수로 디스패치. */
+/** scoringType에 따라 적절한 채점 함수로 디스패치. axis는 생략 시 표준 MBTI 4축. */
 export function score(input: ScoreInput): ScoreResult {
   if (input.scoringType === "axis") {
-    if (!input.axes) {
-      throw new Error("score: axis 채점에는 axes 구성이 필요합니다.");
-    }
-    return scoreAxis(input.selectedScores, input.axes);
+    return scoreAxis(input.selectedScores, input.axes ?? MBTI_AXES);
   }
   return scoreSum(input.selectedScores, input.tieBreak);
 }

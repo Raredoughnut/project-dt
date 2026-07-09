@@ -35,6 +35,7 @@ function make(
 
 const CATALOG: SearchResultTest[] = [
   make("na-donut", "나는 무슨 도넛?", 12000, 2),
+  make("love-mbti", "나의 연애 MBTI", 8600, 1, "연애"),
   make("love-donut", "나의 연애 도넛", 9800, 5),
   make("summer-fruit", "여름 과일 성격", 7100, 1, "취향"),
   make("cafe-mbti", "카페 취향 MBTI", 5400, 8, "취향"),

@@ -3,17 +3,24 @@
    채점 엔진의 입출력 계약. 서버/클라 양쪽에서 재사용한다.
    ======================================================================== */
 
-/** 선택지가 각 차원(sum: 결과코드 / axis: 폴 문자)에 기여하는 점수 맵. 예: { classic: 1 } */
+/**
+ * 선택지가 차원에 기여하는 점수 맵.
+ * - sum: 결과 코드별 양수 점수. 예: { classic: 1 }
+ * - axis: 축별 부호 점수. 예: { energy: 1 }, { energy: -0.5 }
+ */
 export type ScoreMap = Record<string, number>;
 
 /** 채점 방식 (DB tests.scoring_type 와 동일) */
 export type ScoringType = "sum" | "axis";
 
 /**
- * axis 채점의 축 하나. positive/negative 폴 문자를 순서대로 이어 결과 코드를 만든다.
- * 예: { positive: "E", negative: "I" } × 4축 → "ENFP"
+ * axis 채점의 축 하나.
+ * - `key`: 선택지 점수 맵의 축 키(예: "energy"). 선택지는 이 축에 부호 점수를 준다.
+ * - `positive`/`negative`: 축 합이 >= 0 이면 positive 폴 문자, < 0 이면 negative.
+ * 여러 축을 순서대로 이어 결과 코드를 만든다(예: energy·information·decisions·lifestyle → "ESTJ").
  */
 export interface AxisConfig {
+  key: string;
   positive: string;
   negative: string;
 }
@@ -24,7 +31,7 @@ export interface ScoreInput {
   selectedScores: ScoreMap[];
   /** sum 전용: 동점 시 우선순위 코드 목록. 없으면 사전순. */
   tieBreak?: string[];
-  /** axis 전용: 축 구성(순서대로 코드 구성). scoringType이 axis일 때 필수. */
+  /** axis 전용: 축 구성(순서대로 코드 구성). 생략 시 표준 MBTI 4축(MBTI_AXES). */
   axes?: AxisConfig[];
 }
 

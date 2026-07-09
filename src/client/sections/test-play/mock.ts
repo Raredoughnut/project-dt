@@ -1,6 +1,9 @@
 import type { PlayableTest } from "./types";
+import { LOVE_MBTI } from "@/src/content/samples/love-mbti";
 
-/* 스캐폴드용 목업. slug 무관하게 "나는 무슨 도넛?"을 반환한다(어떤 /t/[slug]든 동작).
+/* 스캐폴드용 목업.
+   - "love-mbti"  → axis형 MBTI 테스트(나의 연애 MBTI)
+   - 그 외 slug   → sum형 "나는 무슨 도넛?"
    실제 데이터는 서버 컴포넌트 + DB 쿼리로 주입 예정(로드맵 6). */
 
 const QUESTIONS = [
@@ -77,7 +80,7 @@ const RESULTS = [
   },
 ];
 
-export function getPlayableTestMock(slug: string): PlayableTest {
+function buildDonut(slug: string): PlayableTest {
   return {
     id: slug,
     slug,
@@ -104,4 +107,38 @@ export function getPlayableTestMock(slug: string): PlayableTest {
       traits: r.traits,
     })),
   };
+}
+
+function buildLoveMbti(slug: string): PlayableTest {
+  return {
+    id: slug,
+    slug,
+    title: LOVE_MBTI.title,
+    description: LOVE_MBTI.description,
+    category: LOVE_MBTI.category,
+    coverImage: null,
+    scoringType: "axis",
+    questions: LOVE_MBTI.questions.map((q, qi) => ({
+      id: `q${qi + 1}`,
+      text: q.text,
+      choices: q.choices.map((c, ci) => ({
+        id: `q${qi + 1}c${ci + 1}`,
+        label: c.label,
+        scores: { [c.axis]: c.score },
+      })),
+    })),
+    results: LOVE_MBTI.results.map((r) => ({
+      code: r.code,
+      title: r.title,
+      subtitle: r.subtitle,
+      description: r.description,
+      image: null,
+      traits: r.traits,
+    })),
+  };
+}
+
+export function getPlayableTestMock(slug: string): PlayableTest {
+  if (slug === LOVE_MBTI.slug) return buildLoveMbti(slug);
+  return buildDonut(slug);
 }
