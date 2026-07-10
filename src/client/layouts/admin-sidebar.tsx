@@ -9,9 +9,15 @@ export function AdminSidebar() {
           href="/admin"
           className="font-display text-lg font-bold text-primary"
         >
-          donutest
+          <img
+            src="/logo/donutest-logo.svg"
+            alt="donutest"
+            className="h-7 w-auto"
+          />
         </Link>
-        <span className="ml-2 text-xs text-muted-foreground">admin</span>
+        <div className="flex items-center bg-primary-lighter px-1.5 py-0.5 rounded-sm text-primary-dark">
+          <span className="text-sm font-bold text-primary-dark">ADMIN</span>
+        </div>
       </div>
       <nav className="flex flex-col gap-0.5 px-3 py-2">
         <Link
