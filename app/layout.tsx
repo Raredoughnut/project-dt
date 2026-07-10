@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { bagelFatOne } from "@/fonts/bagel-fat-one";
 import { pretendard } from "@/fonts/pretendard";
 import { suit } from "@/fonts/suit";
+import { GoogleAdSense } from "@/src/components/google-adsense";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +58,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <QueryProvider>{children}</QueryProvider>
       </body>
+      <GoogleAdSense />
     </html>
   );
 }
