@@ -101,9 +101,9 @@
 |---|---|---|---|---|
 | A1 | `/admin/login` | 로그인(아이디/비번, argon2 + jose 세션) ✅구현 | `AdminUser` | P1 |
 | A2 | `/admin` | 대시보드(개요 지표) ✅구현 · 테스트 목록·상태·응시 요약은 다음 단계 | `Test[]`, 집계 | P1 |
-| A3 | `/admin/tests` | 테스트 목록(검색·상태 필터·신규) | `Test[]` | P1 |
-| A4 | `/admin/tests/[id]` | **테스트 편집(복합)**: 메타 · 문항/선택지(점수맵) · 결과카드 · 발행 | `Test`+`Question[]`+`Choice[]`+`ResultCard[]` | P1 |
-| A5 | `/admin/sets` | 세트 큐레이션(생성·항목 순서 편집) | `TestSet`+`TestSetItem[]` | P2 |
+| A3 | `/admin/tests` | 테스트 목록(생성·공개전환·삭제) ✅구현 · 검색/필터는 다음 | `Test[]` | P1 |
+| A4 | `/admin/tests/[id]` | **테스트 편집(복합)**: 메타 · 문항/선택지(점수맵) · 결과카드 · 발행 ✅구현 | `Test`+`Question[]`+`Choice[]`+`ResultCard[]` | P1 |
+| A5 | `/admin/sets` | 세트 큐레이션(생성·메타편집·삭제·구성 테스트 추가/제거/순서변경) ✅구현 | `TestSet`+`TestSetItem[]` | P2 |
 
 - **A4가 가장 무거움**: 문항·선택지·점수맵(`scores: Record<dim,number>`)·결과 매핑 편집 UX가 핵심. 별도 상세 설계 권장.
 

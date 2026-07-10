@@ -41,3 +41,9 @@ export interface ScoreResult {
   /** 차원별 합산 점수 */
   totals: ScoreMap;
 }
+
+/** 어드민 콘텐츠 액션(문항·결과카드 저장/삭제)의 반환 결과. */
+export interface ActionResult {
+  ok: boolean;
+  error?: string;
+}

@@ -23,11 +23,13 @@ export async function loginAction(
     username: formData.get("username"),
     password: formData.get("password"),
   });
+
   if (!parsed.success) {
     return { error: "아이디와 비밀번호를 모두 입력해주세요." };
   }
 
   const admin = await getAdminByUsername(parsed.data.username);
+
   const ok = admin
     ? await verifyPassword(admin.passwordHash, parsed.data.password)
     : false;

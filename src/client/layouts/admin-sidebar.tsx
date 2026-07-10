@@ -26,9 +26,12 @@ export function AdminSidebar() {
         >
           테스트 관리
         </Link>
-        <span className="cursor-default rounded-lg px-3 py-2 text-sm text-muted-foreground/60">
-          세트 관리 (준비 중)
-        </span>
+        <Link
+          href="/admin/sets"
+          className="rounded-lg px-3 py-2 text-sm font-medium text-foreground transition hover:bg-secondary"
+        >
+          세트 관리
+        </Link>
       </nav>
     </aside>
   );

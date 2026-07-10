@@ -3,10 +3,10 @@
 import { redirect } from "next/navigation";
 import { revalidatePath, updateTag } from "next/cache";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 
 import { db } from "@/src/server/db";
 import { tests } from "@/src/server/db/schema";
+import { isUniqueViolation } from "@/src/server/db/pg-error";
 import { testMetaSchema } from "@/src/domain/schemas";
 import { getCurrentAdmin } from "@/src/server/auth/session-cookie";
 import type { AdminSession } from "@/src/server/auth/session";
@@ -31,17 +31,8 @@ function readMeta(formData: FormData) {
   };
 }
 
-function firstError(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "입력값을 확인해주세요.";
-}
-
-function isUniqueViolation(e: unknown): boolean {
-  return (
-    typeof e === "object" &&
-    e !== null &&
-    "code" in e &&
-    (e as { code?: string }).code === "23505"
-  );
+function firstError(issues: readonly { message: string }[]): string {
+  return issues[0]?.message ?? "입력값을 확인해주세요.";
 }
 
 /** 공개 페이지 캐시 무효화(홈 목록 + 해당 테스트 상세). */
@@ -59,7 +50,7 @@ export async function createTestAction(
 ): Promise<TestFormState> {
   const admin = await requireAdmin();
   const parsed = testMetaSchema.safeParse(readMeta(formData));
-  if (!parsed.success) return { error: firstError(parsed.error) };
+  if (!parsed.success) return { error: firstError(parsed.error.issues) };
   const data = parsed.data;
 
   let newId: string;
@@ -98,7 +89,7 @@ export async function updateTestMetaAction(
   if (typeof id !== "string" || !id) return { error: "잘못된 요청입니다." };
 
   const parsed = testMetaSchema.safeParse(readMeta(formData));
-  if (!parsed.success) return { error: firstError(parsed.error) };
+  if (!parsed.success) return { error: firstError(parsed.error.issues) };
   const data = parsed.data;
 
   const [existing] = await db

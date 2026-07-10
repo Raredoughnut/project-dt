@@ -12,5 +12,6 @@ export async function getAdminByUsername(
     .from(adminUsers)
     .where(eq(adminUsers.username, username))
     .limit(1);
+
   return admin ?? null;
 }

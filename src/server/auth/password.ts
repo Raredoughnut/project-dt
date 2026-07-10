@@ -20,7 +20,8 @@ export async function verifyPassword(
 ): Promise<boolean> {
   try {
     return await verify(passwordHash, plain);
-  } catch {
+  } catch(e) {
+    console.error(e);
     return false;
   }
 }
