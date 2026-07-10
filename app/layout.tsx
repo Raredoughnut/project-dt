@@ -7,6 +7,7 @@ import { bagelFatOne } from "@/fonts/bagel-fat-one";
 import { pretendard } from "@/fonts/pretendard";
 import { suit } from "@/fonts/suit";
 import { GoogleAdSense } from "@/src/components/google-adsense";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,6 +59,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <QueryProvider>{children}</QueryProvider>
+        {process.env.GOOGLE_ANALYTICS_ID && (
+          <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTICS_ID!} />
+        )}
       </body>
     </html>
   );
