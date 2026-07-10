@@ -3,7 +3,7 @@ import Link from "next/link";
 /** 어드민 좌측 네비게이션(정적). PC 에서만 노출. */
 export function AdminSidebar() {
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-border bg-card lg:block">
+    <aside className="hidden w-56 shrink-0 border-r border-border bg-card lg:sticky lg:top-0 lg:block lg:h-screen lg:self-start lg:overflow-y-auto">
       <div className="flex h-14 items-center px-5">
         <Link
           href="/admin"

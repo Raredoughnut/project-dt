@@ -6,7 +6,7 @@ import { AdminUserBadge } from "./admin-user-badge";
 /** 어드민 상단바: 사용자 배지 + 로그아웃(서버 액션). */
 export function AdminTopbar() {
   return (
-    <header className="flex h-14 items-center justify-end gap-3 border-b border-border bg-background px-4 lg:px-6">
+    <header className="sticky top-0 z-10 flex h-14 items-center justify-end gap-3 border-b border-border bg-background px-4 lg:px-6">
       <Suspense
         fallback={<span className="text-sm text-muted-foreground">…</span>}
       >
