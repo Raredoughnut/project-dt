@@ -28,3 +28,25 @@ export const submitAttemptSchema = z.object({
 
 export type Answer = z.infer<typeof answerSchema>;
 export type SubmitAttemptInput = z.infer<typeof submitAttemptSchema>;
+
+/* ── 어드민: 테스트 메타 입력 검증 ─────────────────────────────────────── */
+export const testMetaSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, "제목을 입력해주세요.")
+    .max(80, "제목은 80자 이내로 입력해주세요."),
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, "slug를 입력해주세요.")
+    .max(80, "slug는 80자 이내로 입력해주세요.")
+    .regex(/^[a-z0-9-]+$/, "slug는 영소문자·숫자·하이픈(-)만 사용할 수 있어요."),
+  description: z.string().trim().max(300, "설명은 300자 이내로 입력해주세요."),
+  category: z.string().trim().max(40, "카테고리는 40자 이내로 입력해주세요."),
+  scoringType: z.enum(["sum", "axis"]),
+  status: z.enum(["draft", "published"]),
+});
+
+export type TestMetaInput = z.infer<typeof testMetaSchema>;

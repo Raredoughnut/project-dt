@@ -175,9 +175,10 @@ export const attempts = pgTable(
 );
 
 // ── admin_users ──────────────────────────────────────────────────────────
+// 로그인 식별자는 이메일이 아닌 아이디(username). 최초 계정은 db:seed:admin 로 주입.
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").notNull().unique(),
+  username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

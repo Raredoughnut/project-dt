@@ -1,10 +1,7 @@
-import Link from "next/link";
-import { Search } from "lucide-react";
 import { SiteHeader } from "@/src/client/layouts/site-header";
 import { SiteFooter } from "@/src/client/layouts/site-footer";
 import { SectionHeader } from "@/src/client/sections/home/components/section-header";
 import { TestCard } from "@/src/client/sections/home/components/test-card";
-import { SetCard } from "@/src/client/sections/home/components/set-card";
 import type { HomeData } from "@/src/client/sections/home/types";
 
 interface HomeViewProps {
@@ -33,22 +30,15 @@ export function HomeView({ data }: HomeViewProps) {
           </div>
         </section>
 
-        {/* 검색 진입 + 실시간 참여 */}
-        <section className="mt-4 flex flex-col gap-2 lg:mt-6">
-          <Link
-            href="/search"
-            className="flex h-11 items-center gap-2 rounded-full border border-border bg-muted px-4 text-sm text-muted-foreground lg:max-w-md"
-          >
-            <Search className="size-4" />
-            테스트 검색
-          </Link>
-          {data.liveCount ? (
+        {/* 실시간 참여 (검색은 헤더로 이동) */}
+        {data.liveCount ? (
+          <section className="mt-4 lg:mt-6">
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="size-2 rounded-full bg-green-main" />
               지금 {data.liveCount.toLocaleString()}명이 테스트 중
             </p>
-          ) : null}
-        </section>
+          </section>
+        ) : null}
 
         {/* 이번 주 인기 — 모바일 가로 스크롤 / PC 5열 그리드 */}
         <section className="mt-8 lg:mt-12">
@@ -72,16 +62,6 @@ export function HomeView({ data }: HomeViewProps) {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
             {data.latest.map((test) => (
               <TestCard key={test.id} test={test} />
-            ))}
-          </div>
-        </section>
-
-        {/* 추천 세트 */}
-        <section className="mt-8 lg:mt-12">
-          <SectionHeader title="추천 세트" href="/sets" />
-          <div className="grid gap-4 lg:grid-cols-2">
-            {data.sets.map((set) => (
-              <SetCard key={set.id} set={set} />
             ))}
           </div>
         </section>

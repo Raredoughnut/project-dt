@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getPlayableTestMock } from "@/src/client/sections/test-play/mock";
+import { getPlayableTest } from "@/src/server/db/queries/tests";
 import { TestResultContainer } from "@/src/client/sections/test-result/test-result-container";
 import { LoadingView } from "@/src/client/sections/loading/loading-view";
 
@@ -10,8 +10,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string; code: string }>;
 }): Promise<Metadata> {
   const { slug, code } = await params;
-  const test = getPlayableTestMock(slug);
-  const result = test.results.find((r) => r.code === code) ?? test.results[0];
+  const test = await getPlayableTest(slug);
+  const result = test?.results.find((r) => r.code === code) ?? test?.results[0];
+  if (!test || !result) return { title: "donutest — 30초 심리테스트" };
 
   const title = `${result.title} · ${test.title}`;
   const description = result.subtitle

@@ -81,7 +81,7 @@ erDiagram
 
     admin_users {
         uuid id PK
-        text email UK
+        text username UK
         text password_hash
         timestamptz created_at
     }
@@ -108,4 +108,4 @@ erDiagram
 - `result_cards.recommended_slugs`는 **느슨한 참조**(jsonb) — 외부/미발행 테스트도 가리킬 수 있어 FK를 걸지 않습니다.
 
 **독립 테이블**
-- `admin_users` — `/admin` 접근 전용. 공개 사용자는 인증이 없습니다.
+- `admin_users` — `/admin` 접근 전용. 로그인 식별자는 **아이디(`username`)**, 비밀번호는 **argon2id 해시**로 저장. 공개 사용자는 인증이 없습니다.

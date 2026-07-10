@@ -9,7 +9,7 @@
 |---|---|---|
 | 콘텐츠 저장 | **DB 기반 + 운영 어드민 UI** | 테스트/문항/선택지/결과를 DB에 저장, `/admin`에서 저작 |
 | 렌더링 | **RSC + Cache Components(PPR)** | 공개 페이지는 서버 컴포넌트 + 태그 캐시. 어드민 편집 시 태그 재검증 |
-| DB / 호스팅 | **Oracle 무료 VM 자가호스팅 Postgres** (Docker Compose) | 앱도 같은 VM에 Docker standalone |
+| DB / 호스팅 | **Supabase (관리형 Postgres)** — 개발·운영 공용 | Drizzle+postgres.js로 직접 연결(Session pooler + `?sslmode=require`). 앱은 Docker standalone |
 | ORM | **Drizzle** | SQL-first, 경량, Next 16 문서 예시와 정합 |
 | 검증 | **zod** | 폼/액션 입력 검증 |
 
@@ -53,8 +53,11 @@
 통계:
 - **Attempt** `{ id, testId, resultCode, createdAt, referrer, channel }` — 완료 1건 = 1행 → "최근 7일 인기", "테스트별 응시자 수", "유입 채널 비중" 집계 원천.
 
-어드민 인증:
-- **AdminUser** `{ id, email, passwordHash, createdAt }` — `/admin` 접근 전용. 공개 사용자는 인증 없음.
+어드민 인증(구현됨):
+- **AdminUser** `{ id, username, passwordHash, createdAt }` — 로그인은 **아이디(username)+비밀번호**. 비밀번호는 **argon2id**(`@node-rs/argon2`) 해시.
+- **세션**: `jose` HS256 JWT(8h) → `httpOnly` 쿠키(`dt_admin_session`). 서명키는 `ADMIN_SESSION_SECRET`(.env).
+- **게이트**: `proxy.ts`(Next 16 규칙, 구 middleware)가 `/admin/*` 보호 — JWT만 검증(Edge 호환). 비밀번호 검증(argon2)은 서버 액션(Node)에서만.
+- **최초 계정 주입**: `pnpm db:seed:admin`(자격증명은 `ADMIN_USERNAME`/`ADMIN_PASSWORD` env). 초기 `email` 컬럼은 `username`으로 정합화됨.
 
 ## 4. 라우팅 맵
 
@@ -122,8 +125,8 @@ intro → name → question(n) → scoring(2~3s 애니메이션) → redirect(/t
 
 ## 9. 배포
 
-- **Docker standalone → Oracle 무료 VM(Ampere A1)**. pf의 Dockerfile 재사용 + `output: "standalone"`.
-- **Postgres**는 같은 VM에 Docker Compose로. 백업 스크립트 필요.
+- **앱**: Docker standalone(자가호스팅 VM 등). pf의 Dockerfile 재사용 + `output: "standalone"`.
+- **DB**: **Supabase 관리형 Postgres**(백업·커넥션 풀러 제공). 앱은 `DATABASE_URL`(Session pooler, `?sslmode=require`)로 직접 연결. 로컬 Docker PG는 오프라인 폴백(선택).
 - 앱 컨테이너 ↔ DB 컨테이너 네트워크 연결, 환경변수로 `DATABASE_URL`·어드민 세션 시크릿·GA ID 주입.
 
 ## 10. 단계별 로드맵
@@ -134,5 +137,5 @@ intro → name → question(n) → scoring(2~3s 애니메이션) → redirect(/t
 4. **결과 공유** — OG 이미지, 다운로드, 공유 링크.
 5. **메인 페이지** — 배너, 최신/인기/추천세트, 검색.
 6. **어드민** — 세션 인증, 테스트/세트 CRUD, 태그 재검증.
-7. **통계 & 배포** — Attempt 집계, GA4, Docker Compose(앱+PG), Oracle VM, OG 검증.
+7. **통계 & 배포** — Attempt 집계, GA4, 앱 컨테이너 배포(+ Supabase DB), OG 검증.
 ```

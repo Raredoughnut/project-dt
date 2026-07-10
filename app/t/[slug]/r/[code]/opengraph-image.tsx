@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getPlayableTestMock } from "@/src/client/sections/test-play/mock";
+import { getPlayableTest } from "@/src/server/db/queries/tests";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -27,8 +27,8 @@ export default async function Image({
   params: Promise<{ slug: string; code: string }>;
 }) {
   const { slug, code } = await params;
-  const test = getPlayableTestMock(slug);
-  const result = test.results.find((r) => r.code === code) ?? test.results[0];
+  const test = await getPlayableTest(slug);
+  const result = test?.results.find((r) => r.code === code) ?? test?.results[0];
   const font = await loadFont();
 
   return new ImageResponse(
@@ -54,7 +54,7 @@ export default async function Image({
             marginBottom: 28,
           }}
         >
-          {test.title}
+          {test?.title ?? "심리테스트"}
         </div>
 
         {/* 도넛 링 */}
@@ -72,7 +72,7 @@ export default async function Image({
           }}
         />
 
-        {result.subtitle ? (
+        {result?.subtitle ? (
           <div
             style={{
               display: "flex",
@@ -93,7 +93,7 @@ export default async function Image({
             textAlign: "center",
           }}
         >
-          {result.title}
+          {result?.title ?? "donutest"}
         </div>
 
         <div

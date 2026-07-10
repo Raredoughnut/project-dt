@@ -93,14 +93,14 @@
 
 ---
 
-## 5. 어드민 (P1–P2, 미들웨어 보호)
+## 5. 어드민 (P1–P2, `proxy.ts` 보호)
 
 > 비개발자 저작 도구. 공개 UI만큼 화려할 필요 없이 **명료·효율**. shadcn 폼/테이블 활용.
 
 | ID | 경로 | 화면 | 데이터 | 우선 |
 |---|---|---|---|---|
-| A1 | `/admin/login` | 로그인(이메일/비번, jose 세션) | `AdminUser` | P1 |
-| A2 | `/admin` | 대시보드(테스트 목록·상태·응시 요약) | `Test[]`, 집계 | P1 |
+| A1 | `/admin/login` | 로그인(아이디/비번, argon2 + jose 세션) ✅구현 | `AdminUser` | P1 |
+| A2 | `/admin` | 대시보드(개요 지표) ✅구현 · 테스트 목록·상태·응시 요약은 다음 단계 | `Test[]`, 집계 | P1 |
 | A3 | `/admin/tests` | 테스트 목록(검색·상태 필터·신규) | `Test[]` | P1 |
 | A4 | `/admin/tests/[id]` | **테스트 편집(복합)**: 메타 · 문항/선택지(점수맵) · 결과카드 · 발행 | `Test`+`Question[]`+`Choice[]`+`ResultCard[]` | P1 |
 | A5 | `/admin/sets` | 세트 큐레이션(생성·항목 순서 편집) | `TestSet`+`TestSetItem[]` | P2 |

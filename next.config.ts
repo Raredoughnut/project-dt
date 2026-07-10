@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   // Docker standalone 배포용 최소 출력.
   output: "standalone",
+  // 네이티브 애드온(argon2)은 번들 대상에서 제외 → 서버에서 require 로 로드.
+  serverExternalPackages: ["@node-rs/argon2"],
 };
 
 export default nextConfig;
