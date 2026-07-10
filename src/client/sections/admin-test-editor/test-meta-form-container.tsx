@@ -21,7 +21,8 @@ export function TestMetaFormContainer({
   initial,
 }: TestMetaFormContainerProps) {
   const action = mode === "create" ? createTestAction : updateTestMetaAction;
-  const { formAction, pending, error, ok } = useTestMetaForm(action);
+  const { formAction, pending, error, ok, coverPreview, onPickCover } =
+    useTestMetaForm(action);
 
   return (
     <TestMetaFormView
@@ -32,6 +33,8 @@ export function TestMetaFormContainer({
       pending={pending}
       error={error}
       ok={ok}
+      coverPreview={coverPreview}
+      onPickCover={onPickCover}
     />
   );
 }

@@ -6,6 +6,7 @@ import {
   uuid,
   text,
   integer,
+  boolean,
   jsonb,
   timestamp,
   index,
@@ -174,6 +175,35 @@ export const attempts = pgTable(
   ]
 );
 
+// ── banners (메인 기획전 캐러셀) ──────────────────────────────────────────
+// 이미지는 Supabase Storage(공개 버킷)에 업로드하고 공개 URL 을 저장한다.
+// mobileImageUrl 이 없으면 캐러셀은 imageUrl(PC) 로 폴백한다.
+export const banners = pgTable(
+  "banners",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** 접근성 alt · 어드민 식별용 제목 */
+    title: text("title").notNull(),
+    /** PC 이미지 공개 URL (필수) */
+    imageUrl: text("image_url").notNull(),
+    /** 모바일 이미지 공개 URL (선택 — 없으면 imageUrl 폴백) */
+    mobileImageUrl: text("mobile_image_url"),
+    /** 클릭 시 이동 링크 (선택 — 내부 경로 '/…' 또는 외부 http(s)) */
+    linkUrl: text("link_url"),
+    /** 공개 노출 여부 */
+    isActive: boolean("is_active").notNull().default(true),
+    /** 캐러셀 정렬 순서(오름차순) */
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("banners_active_order_idx").on(t.isActive, t.sortOrder)]
+);
+
 // ── admin_users ──────────────────────────────────────────────────────────
 // 로그인 식별자는 이메일이 아닌 아이디(username). 최초 계정은 db:seed:admin 로 주입.
 export const adminUsers = pgTable("admin_users", {
@@ -252,5 +282,7 @@ export type TestSetItem = typeof testSetItems.$inferSelect;
 export type NewTestSetItem = typeof testSetItems.$inferInsert;
 export type Attempt = typeof attempts.$inferSelect;
 export type NewAttempt = typeof attempts.$inferInsert;
+export type Banner = typeof banners.$inferSelect;
+export type NewBanner = typeof banners.$inferInsert;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type NewAdminUser = typeof adminUsers.$inferInsert;

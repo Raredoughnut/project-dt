@@ -6,4 +6,5 @@ export interface TestMetaInitial {
   category: string;
   scoringType: "sum" | "axis";
   status: "draft" | "published";
+  coverImage: string | null;
 }

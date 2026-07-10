@@ -5,10 +5,15 @@ import { revalidatePath, updateTag } from "next/cache";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/src/server/db";
-import { tests } from "@/src/server/db/schema";
+import { tests, resultCards } from "@/src/server/db/schema";
 import { isUniqueViolation } from "@/src/server/db/pg-error";
 import { testMetaSchema } from "@/src/domain/schemas";
 import { getCurrentAdmin } from "@/src/server/auth/session-cookie";
+import {
+  uploadImage,
+  deleteImageByUrl,
+  validateImageFile,
+} from "@/src/server/storage/supabase";
 import type { AdminSession } from "@/src/server/auth/session";
 import type { TestFormState } from "./admin-tests-types";
 
@@ -35,6 +40,13 @@ function firstError(issues: readonly { message: string }[]): string {
   return issues[0]?.message ?? "입력값을 확인해주세요.";
 }
 
+/** FormData 의 파일 필드 → 실제 업로드할 File 이면 반환, 비었으면 null. */
+function fileFrom(formData: FormData, name: string): File | null {
+  const f = formData.get(name);
+  if (f instanceof File && f.size > 0) return f;
+  return null;
+}
+
 /** 공개 페이지 캐시 무효화(홈 목록 + 해당 테스트 상세). */
 function invalidatePublic(slug: string) {
   updateTag("tests");
@@ -53,6 +65,18 @@ export async function createTestAction(
   if (!parsed.success) return { error: firstError(parsed.error.issues) };
   const data = parsed.data;
 
+  const cover = fileFrom(formData, "coverImage");
+  if (cover) {
+    const err = validateImageFile(cover);
+    if (err) return { error: err };
+  }
+  let coverImage: string | null = null;
+  try {
+    if (cover) coverImage = await uploadImage(cover, "test-cover");
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "이미지 업로드에 실패했어요." };
+  }
+
   let newId: string;
   try {
     const [created] = await db
@@ -62,6 +86,7 @@ export async function createTestAction(
         title: data.title,
         description: data.description || null,
         category: data.category || null,
+        coverImage,
         scoringType: data.scoringType,
         status: data.status,
         authorName: admin.username,
@@ -96,6 +121,7 @@ export async function updateTestMetaAction(
     .select({
       slug: tests.slug,
       publishedAt: tests.publishedAt,
+      coverImage: tests.coverImage,
     })
     .from(tests)
     .where(eq(tests.id, id))
@@ -105,6 +131,18 @@ export async function updateTestMetaAction(
   const publishedAt =
     data.status === "published" ? existing.publishedAt ?? new Date() : null;
 
+  const cover = fileFrom(formData, "coverImage");
+  if (cover) {
+    const err = validateImageFile(cover);
+    if (err) return { error: err };
+  }
+  let coverImage = existing.coverImage;
+  try {
+    if (cover) coverImage = await uploadImage(cover, "test-cover");
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "이미지 업로드에 실패했어요." };
+  }
+
   try {
     await db
       .update(tests)
@@ -113,6 +151,7 @@ export async function updateTestMetaAction(
         title: data.title,
         description: data.description || null,
         category: data.category || null,
+        coverImage,
         scoringType: data.scoringType,
         status: data.status,
         publishedAt,
@@ -123,6 +162,10 @@ export async function updateTestMetaAction(
     if (isUniqueViolation(e)) return { error: "이미 사용 중인 slug입니다." };
     throw e;
   }
+
+  // 교체된 기존 이미지 정리(베스트 에포트).
+  if (cover && existing.coverImage && existing.coverImage !== coverImage)
+    await deleteImageByUrl(existing.coverImage);
 
   invalidatePublic(existing.slug); // 이전 slug
   invalidatePublic(data.slug); // 변경된 slug
@@ -162,13 +205,22 @@ export async function setTestStatusAction(
 export async function deleteTestAction(id: string): Promise<void> {
   await requireAdmin();
   const [existing] = await db
-    .select({ slug: tests.slug })
+    .select({ slug: tests.slug, coverImage: tests.coverImage })
     .from(tests)
     .where(eq(tests.id, id))
     .limit(1);
   if (!existing) return;
 
+  // 저장 이미지 정리를 위해 결과카드 이미지 URL 을 먼저 수집(삭제는 cascade).
+  const rcImages = await db
+    .select({ image: resultCards.image })
+    .from(resultCards)
+    .where(eq(resultCards.testId, id));
+
   await db.delete(tests).where(eq(tests.id, id));
+
+  await deleteImageByUrl(existing.coverImage);
+  for (const r of rcImages) await deleteImageByUrl(r.image);
 
   invalidatePublic(existing.slug);
   revalidatePath("/admin/tests");
