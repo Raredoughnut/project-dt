@@ -20,9 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "donutest — 30초 심리테스트",
+  title: "도너테스트",
   description:
-    "로그인 없이 30초만에 즐기고 공유하는 심리테스트. 나는 무슨 도넛?",
+    "로그인 없이 30초만에 즐기고 공유하는 심리테스트",
 };
 
 export default function RootLayout({
