@@ -28,6 +28,7 @@ function popular(slug: string, title: string, attemptCount: number): PopularTest
 
 export const homeMock: HomeData = {
   liveCount: 462,
+  banners: [],
   popular: [
     popular("na-donut", "나는 무슨 도넛?", 12000),
     popular("love-donut", "나의 연애 도넛", 9800),

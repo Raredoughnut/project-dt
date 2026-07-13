@@ -38,6 +38,12 @@ export function AdminSidebar() {
         >
           세트 관리
         </Link>
+        <Link
+          href="/admin/banners"
+          className="rounded-lg px-3 py-2 text-sm font-medium text-foreground transition hover:bg-secondary"
+        >
+          배너 관리
+        </Link>
       </nav>
     </aside>
   );

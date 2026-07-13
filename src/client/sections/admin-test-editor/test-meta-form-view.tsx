@@ -1,3 +1,5 @@
+import type { ChangeEvent } from "react";
+
 import type { TestMetaInitial } from "./types";
 
 interface TestMetaFormViewProps {
@@ -8,13 +10,15 @@ interface TestMetaFormViewProps {
   pending: boolean;
   error?: string;
   ok?: boolean;
+  coverPreview: string | null;
+  onPickCover: (file: File | null) => void;
 }
 
 const FIELD =
   "h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/30";
 const LABEL = "text-sm font-medium text-foreground";
 
-/** 테스트 메타 폼(프레젠테이션). 비제어 폼 → FormData 로 서버 액션에 전달. */
+/** 테스트 메타 폼(프레젠테이션). 비제어 폼 → multipart FormData 로 서버 액션에 전달. */
 export function TestMetaFormView({
   mode,
   testId,
@@ -23,7 +27,15 @@ export function TestMetaFormView({
   pending,
   error,
   ok,
+  coverPreview,
+  onPickCover,
 }: TestMetaFormViewProps) {
+  const coverSrc = coverPreview ?? initial?.coverImage ?? null;
+
+  function handleCover(e: ChangeEvent<HTMLInputElement>) {
+    onPickCover(e.target.files?.[0] ?? null);
+  }
+
   return (
     <form action={formAction} className="max-w-2xl space-y-5">
       {mode === "edit" && testId ? (
@@ -73,6 +85,32 @@ export function TestMetaFormView({
           className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/30"
           placeholder="한 줄 소개 (선택)"
         />
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="coverImage" className={LABEL}>
+          대표 이미지 <span className="text-muted-foreground">(선택)</span>
+        </label>
+        {coverSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={coverSrc}
+            alt="대표 이미지 미리보기"
+            className="aspect-[4/3] w-full max-w-xs rounded-xl border border-border object-cover"
+          />
+        ) : null}
+        <input
+          id="coverImage"
+          name="coverImage"
+          type="file"
+          accept="image/*"
+          onChange={handleCover}
+          className="block w-full text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary-dark"
+        />
+        <p className="text-xs text-muted-foreground">
+          소개·목록·OG 카드에 쓰입니다. JPG·PNG·WebP, 5MB 이하.
+          {mode === "edit" ? " 새로 선택하지 않으면 기존 이미지를 유지합니다." : ""}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">

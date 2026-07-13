@@ -2,6 +2,8 @@ import { SiteHeader } from "@/src/client/layouts/site-header";
 import { SiteFooter } from "@/src/client/layouts/site-footer";
 import { SectionHeader } from "@/src/client/sections/home/components/section-header";
 import { TestCard } from "@/src/client/sections/home/components/test-card";
+import { SetCard } from "@/src/client/sections/home/components/set-card";
+import { BannerCarousel } from "@/src/client/sections/home/components/banner-carousel";
 import type { HomeData } from "@/src/client/sections/home/types";
 
 interface HomeViewProps {
@@ -19,16 +21,11 @@ export function HomeView({ data }: HomeViewProps) {
 
       <main className="mx-auto w-full max-w-[1440px] px-4 pb-16 sm:px-6 lg:px-10">
         {/* 기획전 배너 · 캐러셀 */}
-        <section className="pt-4 lg:pt-6">
-          <div className="relative flex h-36 items-center justify-center rounded-2xl border border-dashed border-primary-light bg-primary-lighter text-sm text-primary-dark lg:h-64">
-            기획전 배너 · 캐러셀
-            <div className="absolute bottom-3 flex gap-1.5">
-              <span className="h-1.5 w-3.5 rounded-full bg-primary" />
-              <span className="size-1.5 rounded-full bg-primary-light" />
-              <span className="size-1.5 rounded-full bg-primary-light" />
-            </div>
-          </div>
-        </section>
+        {data.banners.length > 0 ? (
+          <section className="pt-4 lg:pt-6">
+            <BannerCarousel banners={data.banners} />
+          </section>
+        ) : null}
 
         {/* 실시간 참여 (검색은 헤더로 이동) */}
         {data.liveCount ? (
@@ -65,6 +62,18 @@ export function HomeView({ data }: HomeViewProps) {
             ))}
           </div>
         </section>
+
+        {/* 추천 세트 — 1열 → 2열 → 4열 */}
+        {data.sets.length > 0 ? (
+          <section className="mt-8 lg:mt-12">
+            <SectionHeader title="추천 세트" href="/sets" />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
+              {data.sets.map((set) => (
+                <SetCard key={set.id} set={set} />
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {/* 네이티브 광고 슬롯 */}
         <div className="mt-8 flex h-16 items-center justify-center rounded-xl border border-dashed border-border text-xs text-muted-foreground lg:mt-12">

@@ -118,3 +118,28 @@ export const setMetaSchema = z.object({
 });
 
 export type SetMetaInput = z.infer<typeof setMetaSchema>;
+
+/* ── 어드민: 배너 메타 입력 검증 (이미지 파일은 액션에서 별도 처리) ───────── */
+export const bannerMetaSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .min(1, "배너 제목을 입력해주세요.")
+    .max(80, "제목은 80자 이내로 입력해주세요."),
+  linkUrl: z
+    .string()
+    .trim()
+    .max(500, "링크는 500자 이내로 입력해주세요.")
+    .refine(
+      (v) => v === "" || v.startsWith("/") || /^https?:\/\//.test(v),
+      "링크는 '/'(내부 경로) 또는 http(s):// 로 시작해야 해요."
+    ),
+  isActive: z.boolean(),
+  sortOrder: z
+    .number()
+    .int("정렬 순서는 정수여야 해요.")
+    .min(0, "정렬 순서는 0 이상이어야 해요.")
+    .max(9999, "정렬 순서가 너무 큽니다."),
+});
+
+export type BannerMetaInput = z.infer<typeof bannerMetaSchema>;

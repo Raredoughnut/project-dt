@@ -66,6 +66,7 @@ export interface AdminResultData {
   title: string;
   subtitle: string | null;
   description: string | null;
+  image: string | null;
   traits: string[];
 }
 
@@ -112,6 +113,7 @@ export async function getAdminTestFull(id: string): Promise<AdminTestFull | null
       title: r.title,
       subtitle: r.subtitle,
       description: r.description,
+      image: r.image,
       traits: r.traits,
     })),
   };

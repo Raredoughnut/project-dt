@@ -85,6 +85,18 @@ erDiagram
         text password_hash
         timestamptz created_at
     }
+
+    banners {
+        uuid id PK
+        text title
+        text image_url "PC 이미지 공개 URL"
+        text mobile_image_url "nullable (없으면 image_url 폴백)"
+        text link_url "nullable"
+        boolean is_active
+        integer sort_order
+        timestamptz created_at
+        timestamptz updated_at
+    }
 ```
 
 ## 노트
@@ -109,3 +121,4 @@ erDiagram
 
 **독립 테이블**
 - `admin_users` — `/admin` 접근 전용. 로그인 식별자는 **아이디(`username`)**, 비밀번호는 **argon2id 해시**로 저장. 공개 사용자는 인증이 없습니다.
+- `banners` — 메인 기획전 캐러셀. 이미지는 **Supabase Storage 공개 버킷**에 업로드하고 공개 URL(`image_url`/`mobile_image_url`)을 저장. 다른 엔티티와 관계 없음(운영자 큐레이션). `is_active` + `sort_order` 로 노출/순서 제어(인덱스 `banners(is_active, sort_order)`).
